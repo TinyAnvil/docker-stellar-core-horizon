@@ -33,6 +33,7 @@ ADD pubnet /opt/stellar-default/pubnet
 ADD testnet /opt/stellar-default/testnet
 ADD standalone /opt/stellar-default/standalone
 
+RUN ["apt-get", "install", "postgresql-contrib-9.6"]
 
 ADD start /
 RUN ["chmod", "+x", "start"]
