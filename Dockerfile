@@ -31,7 +31,6 @@ RUN ["ln", "-s", "/opt/stellar/horizon/etc/horizon.env", "/horizon.env"]
 ADD common /opt/stellar-default/common
 ADD pubnet /opt/stellar-default/pubnet
 ADD testnet /opt/stellar-default/testnet
-ADD standalone /opt/stellar-default/standalone
 
 RUN ["apt-get", "install", "postgresql-contrib-9.6"]
 
