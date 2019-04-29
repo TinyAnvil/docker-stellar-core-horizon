@@ -5,7 +5,6 @@ export STELLAR_HOME="/opt/stellar"
 export PGHOME="$STELLAR_HOME/postgresql"
 export SUPHOME="$STELLAR_HOME/supervisor"
 export COREHOME="$STELLAR_HOME/core"
-export HZHOME="$STELLAR_HOME/horizon"
 
 export PGBIN="/usr/lib/postgresql/9.6/bin"
 export PGDATA="$PGHOME/data"
@@ -28,7 +27,6 @@ function main() {
 	copy_defaults
 	init_db
 	init_stellar_core
-	init_horizon
 	copy_pgpass
 
 	stop_postgres  # this gets started in init_db
@@ -156,12 +154,6 @@ function copy_defaults() {
 		$CP /opt/stellar-default/common/core/ $COREHOME
 		$CP /opt/stellar-default/$NETWORK/core/ $COREHOME
 	fi
-
-	if [ -d $HZHOME/etc ]; then
-		echo "horizon: config directory exists, skipping copy"
-	else
-		$CP /opt/stellar-default/common/horizon/ $HZHOME
-	fi
 }
 
 function copy_pgpass() {
@@ -199,11 +191,9 @@ function init_db() {
 	run_silent "init-postgres" sudo -u postgres $PGBIN/initdb -D $PGDATA
 
 	start_postgres
-	run_silent "create-horizon-db" sudo -u postgres createdb horizon
 	run_silent "create-core-db" sudo -u postgres createdb core
 	run_silent "stellar-postgres-user" sudo -u postgres psql <<-SQL
 		CREATE USER $PGUSER WITH PASSWORD '$PGPASS';
-		GRANT ALL PRIVILEGES ON DATABASE horizon to $PGUSER;
 		GRANT ALL PRIVILEGES ON DATABASE core to $PGUSER;
 	SQL
 
@@ -235,27 +225,6 @@ function init_stellar_core() {
 	if [ "$NETWORK" == "standalone" ]; then
 		run_silent "init-core-scp" sudo -u stellar stellar-core --forcescp --conf etc/stellar-core.cfg
 	fi
-
-	touch .quickstart-initialized
-	popd
-}
-
-function init_horizon() {
-	if [ -f $HZHOME/.quickstart-initialized ]; then
-		echo "horizon: already initialized"
-		return 0
-	fi
-	pushd $HZHOME
-
-	run_silent "chown-horizon" chown stellar:stellar .
-	
-	sed -ri \
-		-e "s/__PGPASS__/$PGPASS/g" \
-		-e "s/__NETWORK__/$NETWORK_PASSPHRASE/g" \
-		etc/horizon.env
-
-	start_postgres
-	run_silent "init-horizon-db" sudo -u stellar ./bin/horizon db init
 
 	touch .quickstart-initialized
 	popd

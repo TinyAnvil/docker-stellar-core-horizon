@@ -3,10 +3,8 @@ FROM stellar/base:latest
 MAINTAINER Bartek Nowotarski <bartek@stellar.org>
 
 ENV STELLAR_CORE_VERSION 10.3.0-838-de204d71
-ENV HORIZON_VERSION 0.17.4
 
 EXPOSE 5432
-EXPOSE 8000
 EXPOSE 11625
 EXPOSE 11626
 
@@ -27,11 +25,8 @@ RUN useradd --uid 10011001 --home-dir /home/stellar --no-log-init stellar \
 
 RUN ["ln", "-s", "/opt/stellar", "/stellar"]
 RUN ["ln", "-s", "/opt/stellar/core/etc/stellar-core.cfg", "/stellar-core.cfg"]
-RUN ["ln", "-s", "/opt/stellar/horizon/etc/horizon.env", "/horizon.env"]
-ADD common /opt/stellar-default/common
 ADD pubnet /opt/stellar-default/pubnet
 ADD testnet /opt/stellar-default/testnet
-ADD standalone /opt/stellar-default/standalone
 
 RUN ["apt-get", "install", "postgresql-contrib-9.6"]
 
