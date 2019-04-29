@@ -25,6 +25,7 @@ RUN useradd --uid 10011001 --home-dir /home/stellar --no-log-init stellar \
 
 RUN ["ln", "-s", "/opt/stellar", "/stellar"]
 RUN ["ln", "-s", "/opt/stellar/core/etc/stellar-core.cfg", "/stellar-core.cfg"]
+ADD common /opt/stellar-default/common
 ADD pubnet /opt/stellar-default/pubnet
 ADD testnet /opt/stellar-default/testnet
 
